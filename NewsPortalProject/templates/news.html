@@ -1,0 +1,84 @@
+{% extends 'flatpages/default.html' %}
+{% load censor_filters %}
+{% load custom_tags %}
+
+{% block title %}
+Новости
+{% endblock title %}
+
+{% block content %}
+
+<div style="text-align: right; margin-bottom: 20px;">
+    {% if user.is_authenticated %}
+        <span>Привет, {{ user.username }}!</span>
+        {% if not user.groups.all|length %}
+            <span> (группа: common)</span>
+        {% else %}
+            <span> (группы:
+                {% for group in user.groups.all %}
+                    {{ group.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %})
+            </span>
+        {% endif %}
+        {% if user.author %}
+            <span> | Рейтинг автора: {{ user.author.rating }}</span>
+        {% endif %}
+        <form method="post" action="{% url 'account_logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; color: blue; cursor: pointer; text-decoration: underline;">Выйти</button>
+        </form>
+        {% if not user.groups.all %}
+            <a href="{% url 'upgrade' %}"> | Стать автором</a>
+        {% endif %}
+    {% else %}
+        <a href="{% url 'account_login' %}">Войти</a> |
+        <a href="{% url 'account_signup' %}">Регистрация</a>
+    {% endif %}
+</div>
+
+<h1>Все новости</h1>
+<p>Всего новостей: {{ news_count }}</p>
+
+<a href="{% url 'news_search' %}">🔍 Поиск новостей</a>
+<hr>
+
+{% if news %}
+    {% for item in news %}
+        <div class="news-item">
+            <h2><a href="{% url 'news_detail' item.id %}">{{ item.title|censor }}</a></h2>
+            <p class="news-date">{{ item.created_at|date:"d.m.Y" }}</p>
+            <p class="news-preview">{{ item.text|censor|truncatechars:20 }}</p>
+            <p><strong>Рейтинг:</strong> {{ item.rating }}</p>
+        </div>
+    {% endfor %}
+{% else %}
+    <h2>Новостей нет!</h2>
+{% endif %}
+
+<!-- ПАГИНАЦИЯ -->
+<div class="pagination" style="margin-top: 20px; text-align: center;">
+    {% if page_obj.has_previous %}
+        <a href="?{% url_replace page=1 %}">«« Первая</a>
+        <a href="?{% url_replace page=page_obj.previous_page_number %}">« Предыдущая</a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <strong>{{ num }}</strong>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?{% url_replace page=num %}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a href="?{% url_replace page=page_obj.next_page_number %}">Следующая »</a>
+        <a href="?{% url_replace page=page_obj.paginator.num_pages %}">Последняя »»</a>
+    {% endif %}
+</div>
+
+<p style="margin-top: 20px;">
+    <a href="{% url 'news_create' %}">➕ Создать новость</a> |
+    <a href="{% url 'article_create' %}">📝 Создать статью</a>
+</p>
+
+{% endblock content %}

@@ -1,0 +1,22 @@
+{% extends 'flatpages/default.html' %}
+
+{% load censor_filters %}
+
+{% block title %}
+{% if object %}Редактирование{% else %}Создание{% endif %}
+{% endblock title %}
+
+{% block content %}
+{% if perms.news.add_post or perms.news.change_post %}
+    <h1>{% if object %}Редактирование{% else %}Создание{% endif %}</h1>
+    <hr>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Сохранить">
+    </form>
+{% else %}
+    <h2>У вас нет прав для этой операции</h2>
+{% endif %}
+<p><a href="{% url 'news_list' %}">← Назад</a></p>
+{% endblock content %}

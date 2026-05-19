@@ -1,0 +1,18 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+Вход в систему
+{% endblock title %}
+
+{% block content %}
+<h2>Вход в систему</h2>
+
+<form method="post" action="{% url 'account_login' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Войти</button>
+</form>
+
+<p><a href="{% url 'account_signup' %}">Регистрация</a></p>
+<p><a href="/news/">На главную</a></p>
+{% endblock content %}

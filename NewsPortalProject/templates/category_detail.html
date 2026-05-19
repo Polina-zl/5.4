@@ -1,0 +1,44 @@
+{% extends 'flatpages/default.html' %}
+{% load censor_filters %}
+
+{% block title %}
+{{ category.name }}
+{% endblock title %}
+
+{% block content %}
+
+<h1>Категория: {{ category.name }}</h1>
+
+{% if user.is_authenticated %}
+    {% if user in category.subscribers.all %}
+        <form method="post" action="{% url 'unsubscribe' category.id %}">
+            {% csrf_token %}
+            <button type="submit" style="background-color: red; color: white;">Отписаться</button>
+        </form>
+    {% else %}
+        <form method="post" action="{% url 'subscribe' category.id %}">
+            {% csrf_token %}
+            <button type="submit" style="background-color: green; color: white;">Подписаться</button>
+        </form>
+    {% endif %}
+{% else %}
+    <p><a href="{% url 'account_login' %}">Войдите</a>, чтобы подписаться на категорию</p>
+{% endif %}
+
+<hr>
+
+<h2>Статьи в этой категории:</h2>
+
+{% for post in category.post_set.all %}
+    <div style="border-bottom: 1px solid #ccc; padding: 15px 0;">
+        <h3><a href="{% url 'news_detail' post.id %}">{{ post.title|censor }}</a></h3>
+        <p>{{ post.created_at|date:"d.m.Y" }}</p>
+        <p>{{ post.text|censor|truncatechars:100 }}</p>
+    </div>
+{% empty %}
+    <p>В этой категории пока нет статей</p>
+{% endfor %}
+
+<p><a href="{% url 'news_list' %}">← Назад ко всем новостям</a></p>
+
+{% endblock content %}

@@ -1,0 +1,22 @@
+{% load account %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение регистрации</title>
+</head>
+<body>
+    <h1>Добро пожаловать, {{ user.username }}!</h1>
+    <p>Спасибо за регистрацию на нашем новостном портале!</p>
+    <p>Для завершения регистрации, пожалуйста, перейдите по ссылке:</p>
+    <p><a href="{{ activate_url }}">{{ activate_url }}</a></p>
+    <p>После подтверждения вы сможете:</p>
+    <ul>
+        <li>Подписываться на категории новостей</li>
+        <li>Получать уведомления о новых статьях</li>
+        <li>Стать автором и публиковать свои статьи</li>
+    </ul>
+    <p>С уважением,<br>Команда News Portal</p>
+</body>
+</html>

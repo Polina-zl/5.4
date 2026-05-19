@@ -1,0 +1,51 @@
+{% extends 'flatpages/default.html' %}
+{% load censor_filters %}
+{% load custom_tags %}
+
+{% block title %}
+Поиск новостей
+{% endblock title %}
+
+{% block content %}
+<h1>Поиск новостей</h1>
+
+<form method="get">
+    {{ filterset.form.as_p }}
+    <input type="submit" value="Найти">
+</form>
+
+<hr>
+
+{% if news %}
+    <p>Найдено новостей: {{ news|length }}</p>
+    {% for item in news %}
+        <div class="news-item">
+            <h2><a href="{% url 'news_detail' item.id %}">{{ item.title|censor }}</a></h2>
+            <p class="news-date">{{ item.created_at|date:"d.m.Y" }}</p>
+            <p class="news-author"><strong>Автор:</strong> {{ item.author.user.username|censor }}</p>
+            <p class="news-preview">{{ item.text|censor|truncatechars:50 }}</p>
+        </div>
+    {% endfor %}
+
+    <!-- ПАГИНАЦИЯ ДЛЯ РЕЗУЛЬТАТОВ ПОИСКА -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?{% url_replace page=1 %}">Первая</a>
+            <a href="?{% url_replace page=page_obj.previous_page_number %}">Предыдущая</a>
+        {% endif %}
+
+        <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?{% url_replace page=page_obj.next_page_number %}">Следующая</a>
+            <a href="?{% url_replace page=page_obj.paginator.num_pages %}">Последняя</a>
+        {% endif %}
+    </div>
+
+{% else %}
+    <h2>Новостей не найдено</h2>
+{% endif %}
+
+<p><a href="{% url 'news_list' %}">← Назад ко всем новостям</a></p>
+
+{% endblock content %}
